@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VideoAgent Pro — Agente IA para Producción Publicitaria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0c;
+  --surface:#111115;
+  --surface2:#17171d;
+  --surface3:#1e1e26;
+  --border:#2a2a35;
+  --border2:#353545;
+  --accent:#e8c547;
+  --accent2:#c47a3a;
+  --accent-dim:rgba(232,197,71,.12);
+  --text:#f0ede8;
+  --muted:#888;
+  --muted2:#555;
+  --danger:#e05a5a;
+  --success:#4caf7d;
+  --font-display:'Syne',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+  --radius:10px;
+  --radius-lg:14px;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;display:flex;flex-direction:column}
+
+/* ── HEADER ── */
+.hdr{display:flex;align-items:center;gap:14px;padding:16px 28px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;z-index:10}
+.hdr-logo{width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hdr-logo svg{width:20px;height:20px}
+.hdr-info{flex:1}
+.hdr-title{font-family:var(--font-display);font-size:15px;font-weight:800;letter-spacing:-.3px}
+.hdr-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.hdr-key{display:flex;align-items:center;gap:8px}
+.key-label{font-size:11px;color:var(--muted)}
+.key-input{width:220px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:var(--font-body);font-size:12px;padding:7px 11px;outline:none;transition:border-color .2s}
+.key-input:focus{border-color:var(--accent)}
+.hdr-mode{display:flex;gap:5px;margin-left:12px}
+.mode-btn{font-family:var(--font-display);font-size:11px;font-weight:600;padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.mode-btn.active{background:var(--accent);color:#0a0a0c;border-color:var(--accent)}
+
+/* ── STEPS BAR ── */
+.steps-wrap{background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.steps{display:flex;padding:0 28px;overflow-x:auto}
+.step{display:flex;align-items:center;gap:8px;padding:11px 14px 11px 0;cursor:pointer;opacity:.35;transition:all .2s;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.step.active{opacity:1;border-bottom-color:var(--accent)}
+.step.done{opacity:.65}
+.step:hover:not(.active){opacity:.6}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--font-display);flex-shrink:0;transition:background .2s}
+.step.active .step-num{background:var(--accent);color:#0a0a0c}
+.step.done .step-num{background:var(--success);color:#fff;font-size:12px}
+.step-label{font-size:11px;font-family:var(--font-display);font-weight:700;letter-spacing:.4px}
+.step-sep{margin:0 2px;color:var(--muted2);font-size:12px;align-self:center}
+
+/* ── MAIN LAYOUT ── */
+.main{display:grid;grid-template-columns:1fr 360px;flex:1;overflow:hidden}
+
+/* ── PANEL ── */
+.panel{padding:28px;overflow-y:auto;display:flex;flex-direction:column;gap:0}
+.panel-title{font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px}
+.panel-sub{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+/* form */
+label{display:block;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:18px}
+label:first-of-type{margin-top:0}
+input,textarea,select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:var(--font-body);font-size:13px;padding:10px 13px;outline:none;transition:border-color .2s;resize:vertical;line-height:1.5}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);background:var(--surface3)}
+select option{background:var(--surface2)}
+textarea{min-height:88px;line-height:1.6}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* tags */
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:11px;padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;font-family:var(--font-body);font-weight:400}
+.tag:hover{border-color:var(--border2);color:var(--text)}
+.tag.sel{background:var(--accent);color:#0a0a0c;border-color:var(--accent);font-weight:500}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-display);font-weight:700;font-size:12px;padding:11px 20px;border-radius:var(--radius);border:none;cursor:pointer;transition:all .2s;letter-spacing:.3px;text-decoration:none}
+.btn-primary{background:var(--accent);color:#0a0a0c}
+.btn-primary:hover:not(:disabled){background:#f0d060;transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:7px 13px;font-size:11px}
+.btn-actions{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap;padding-bottom:4px}
+
+/* divider */
+.divider{display:flex;align-items:center;gap:10px;margin:20px 0 14px}
+.divider span{font-family:var(--font-display);font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* info box */
+.info-box{background:var(--accent-dim);border:1px solid rgba(232,197,71,.2);border-radius:var(--radius);padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7;margin-top:14px}
+.info-box strong{color:var(--accent)}
+
+/* loading */
+.loading-wrap{display:flex;align-items:center;gap:12px;color:var(--muted);margin:24px 0}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:10px}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;animation:prog 2s ease-in-out infinite alternate}
+@keyframes prog{from{width:20%}to{width:85%}}
+
+/* scenes */
+.scenes-grid{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.scene-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;transition:border-color .2s;cursor:default}
+.scene-card:hover{border-color:var(--border2)}
+.scene-num{font-family:var(--font-display);font-size:9px;font-weight:800;color:var(--accent);letter-spacing:1.2px;margin-bottom:5px;text-transform:uppercase}
+.scene-narr{font-size:12px;color:var(--text);line-height:1.55;margin-bottom:6px}
+.scene-prompt{font-size:11px;color:var(--muted);line-height:1.6;font-style:italic;border-top:1px solid var(--border);padding-top:6px;margin-top:4px}
+.more-scenes{text-align:center;color:var(--muted2);font-size:11px;padding:10px 0;font-style:italic}
+
+/* export */
+.export-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:4px}
+.export-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)}
+.export-row:last-child{border-bottom:none}
+.export-label{font-size:12px;color:var(--text)}
+.export-val{font-size:11px;color:var(--muted);font-family:var(--font-display);font-weight:600}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;font-family:var(--font-display);letter-spacing:.4px}
+.badge-ok{background:rgba(76,175,125,.15);color:var(--success);border:1px solid rgba(76,175,125,.3)}
+
+.export-btns{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.export-btn-row{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;cursor:pointer;transition:all .2s}
+.export-btn-row:hover{border-color:var(--accent);background:var(--surface3)}
+.export-btn-row.primary-row{background:rgba(232,197,71,.08);border-color:rgba(232,197,71,.3)}
+.export-btn-row.primary-row:hover{background:rgba(232,197,71,.15)}
+.ebr-label{font-size:13px;color:var(--text)}
+.ebr-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.ebr-icon{font-size:18px}
+
+/* char counter */
+.char-counter{font-size:10px;color:var(--muted2);text-align:right;margin-top:4px}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sidebar-title{font-family:var(--font-display);font-size:12px;font-weight:700;flex:1;letter-spacing:.3px}
+.copy-btn{font-size:11px;font-family:var(--font-body);padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.sidebar-body{flex:1;overflow-y:auto;padding:16px 18px;font-size:11.5px;line-height:1.85;color:var(--muted);white-space:pre-wrap;word-break:break-word;font-family:'DM Sans',sans-serif}
+.sidebar-body .em{color:var(--accent);font-style:normal;font-weight:600;font-family:var(--font-display);font-size:10px;letter-spacing:.8px}
+.sidebar-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--muted2);text-align:center;padding:24px}
+.sidebar-placeholder svg{width:40px;height:40px;opacity:.25;margin-bottom:4px}
+.sidebar-placeholder p{font-size:12px;line-height:1.6}
+
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted2)}
+
+/* responsive */
+@media(max-width:768px){
+  .main{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .hdr-key{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-logo">
+    <svg viewBox="0 0 20 20" fill="#0a0a0c" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 3h9l4 4v10H3V3z" opacity=".5"/>
+      <path d="M9 8l3 3.5-3 1.5-3-1.5L9 8z"/>
+      <circle cx="9" cy="15" r="1.5"/>
+    </svg>
+  </div>
+  <div class="hdr-info">
+    <div class="hdr-title">VideoAgent Pro</div>
+    <div class="hdr-sub">Agente IA · Producción Publicitaria</div>
+  </div>
+  <div class="hdr-key">
+    <span class="key-label">API Key Anthropic</span>
+    <input type="password" class="key-input" id="api-key" placeholder="sk-ant-api03-..." autocomplete="off">
+  </div>
+  <div class="hdr-mode">
+    <button class="mode-btn active" onclick="setMode('corto')">Ad Corto</button>
+    <button class="mode-btn" onclick="setMode('largo')">Contenido Largo</button>
+  </div>
+</header>
+
+<!-- STEPS -->
+<div class="steps-wrap">
+  <div class="steps" id="steps-bar">
+    <div class="step active" onclick="goStep(0)"><div class="step-num">1</div><div class="step-label">BRIEF</div></div>
+    <div class="step-sep">›</div>
+    <div class="step" onclick="goStep(1)"><div class="step-num">2</div><div class="step-label">NARRATIVA</div></div>
+    <div class="step-sep">›</div>
+    <div class="step" onclick="goStep(2)"><div class="step-num">3</div><div class="step-label">ESCENAS</div></div>
+    <div class="step-sep">›</div>
+    <div class="step" onclick="goStep(3)"><div class="step-num">4</div><div class="step-label">PROMPTS</div></div>
+    <div class="step-sep">›</div>
+    <div class="step" onclick="goStep(4)"><div class="step-num">5</div><div class="step-label">EXPORTAR</div></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="panel" id="main-panel"></div>
+  <div class="sidebar">
+    <div class="sidebar-hdr">
+      <div class="sidebar-title" id="sidebar-title">Vista previa</div>
+      <button class="copy-btn" onclick="copyOutput()">Copiar todo</button>
+    </div>
+    <div class="sidebar-body" id="sidebar-body">
+      <div class="sidebar-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8M12 17v4"/>
+        </svg>
+        <p>El contenido generado<br>aparecerá aquí en tiempo real</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = "/.netlify/functions/claude";
+
+let state = {
+  mode: 'corto',
+  step: 0,
+  brief: {},
+  narrativa: '',
+  escenas: [],
+  prompts: [],
+  loading: false
+};
+
+// ── NAVIGATION ──────────────────────────────────────────────
+function goStep(n){
+  if(state.loading) return;
+  if(n > 1 && !state.narrativa) return;
+  if(n > 2 && state.escenas.length === 0) return;
+  if(n > 3 && state.prompts.length === 0) return;
+  state.step = n;
+  renderSteps();
+  renderPanel();
+}
+
+function renderSteps(){
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.className = 'step' + (i===state.step?' active':(i<state.step?' done':''));
+    const num = s.querySelector('.step-num');
+    if(i < state.step) num.textContent = '✓';
+    else num.textContent = i + 1;
+  });
+}
+
+// ── MODE ────────────────────────────────────────────────────
+function setMode(m){
+  if(state.loading) return;
+  state.mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active',
+      (m==='corto' && b.textContent.includes('Corto')) ||
+      (m==='largo' && b.textContent.includes('Largo'))
+    );
+  });
+  if(state.step === 0) renderPanel();
+}
+
+// ── PANEL RENDER ─────────────────────────────────────────────
+function renderPanel(){
+  const p = document.getElementById('main-panel');
+  const fns = [renderBrief, renderNarrativa, renderEscenas, renderPromptsPanel, renderExportar];
+  p.innerHTML = fns[state.step]();
+  bindEvents();
+}
+
+function renderBrief(){
+  const b = state.brief;
+  const isCorto = state.mode === 'corto';
+  return `
+<div class="panel-title">Brief del cliente</div>
+<div class="panel-sub">Completa los datos del proyecto. Cuanto más detallado, mejor será el resultado generado por la IA.</div>
+
+<label>Nombre de la marca / producto *</label>
+<input id="f-marca" placeholder="Ej: Nike Air Max 2025, Café Orgánico Selva..." value="${b.marca||''}">
+
+<label>¿Qué hace o vende? ¿Cuál es su diferenciador? *</label>
+<textarea id="f-producto" placeholder="Describe el producto o servicio, sus beneficios clave y por qué es único en el mercado...">${b.producto||''}</textarea>
+
+<label>Público objetivo</label>
+<input id="f-publico" placeholder="Ej: Mujeres emprendedoras 25-40 que buscan crecimiento personal" value="${b.publico||''}">
+
+<div class="divider"><span>Estilo creativo</span></div>
+
+<label>Tono emocional (selecciona los que apliquen)</label>
+<div class="tags" id="tags-tono">
+  ${['Épico','Inspirador','Urgente','Emocional','Aspiracional','Minimalista','Rebelde','Lujoso','Divertido','Dramático','Nostálgico','Poderoso'].map(t=>`<button class="tag${(b.tono||[]).includes(t)?' sel':''}" onclick="toggleTag('tono','${t}')">${t}</button>`).join('')}
+</div>
+
+<label style="margin-top:16px">Estilo visual</label>
+<div class="tags" id="tags-estilo">
+  ${['Cinematográfico','Documental','Minimalista','Editorial','Hiperrealista','Publicitario premium','Street style','Lifestyle','Corporativo elegante'].map(t=>`<button class="tag${(b.estilo||[]).includes(t)?' sel':''}" onclick="toggleTag('estilo','${t}')">${t}</button>`).join('')}
+</div>
+
+<div class="divider"><span>Parámetros de producción</span></div>
+
+${isCorto ? `
+<div class="row2">
+  <div>
+    <label>Duración del ad</label>
+    <select id="f-duracion">
+      <option value="15" ${b.duracion=='15'?'selected':''}>15 segundos</option>
+      <option value="30" ${b.duracion=='30'?'selected':''}>30 segundos</option>
+      <option value="45" ${b.duracion=='45'?'selected':''}>45 segundos</option>
+      <option value="60" ${(!b.duracion||b.duracion=='60')?'selected':''}>60 segundos</option>
+    </select>
+  </div>
+  <div>
+    <label>Generador de video IA</label>
+    <select id="f-gen">
+      <option value="Seedance 2.0">Seedance 2.0</option>
+      <option value="Kling">Kling</option>
+      <option value="Runway Gen-4">Runway Gen-4</option>
+      <option value="Sora">Sora</option>
+      <option value="Pika 2.0">Pika 2.0</option>
+    </select>
+  </div>
+</div>
+` : `
+<div class="row2">
+  <div>
+    <label>Duración total</label>
+    <select id="f-duracion">
+      <option value="3" ${b.duracion=='3'?'selected':''}>3 minutos</option>
+      <option value="5" ${(!b.duracion||b.duracion=='5')?'selected':''}>5 minutos</option>
+      <option value="8" ${b.duracion=='8'?'selected':''}>8 minutos</option>
+      <option value="10" ${b.duracion=='10'?'selected':''}>10 minutos</option>
+      <option value="15" ${b.duracion=='15'?'selected':''}>15 minutos</option>
+    </select>
+  </div>
+  <div>
+    <label>Duración por clip</label>
+    <select id="f-clipdur">
+      <option value="4" ${b.clipdur=='4'?'selected':''}>4 segundos</option>
+      <option value="6" ${(!b.clipdur||b.clipdur=='6')?'selected':''}>6 segundos</option>
+      <option value="8" ${b.clipdur=='8'?'selected':''}>8 segundos</option>
+    </select>
+  </div>
+</div>
+<div>
+  <label>Generador de video IA</label>
+  <select id="f-gen">
+    <option value="Seedance 2.0">Seedance 2.0</option>
+    <option value="Kling">Kling</option>
+    <option value="Runway Gen-4">Runway Gen-4</option>
+    <option value="Sora">Sora</option>
+  </select>
+</div>
+`}
+
+<label>Referencias visuales / competidores / inspiración (opcional)</label>
+<textarea id="f-refs" placeholder="Ej: Estilo Nike 'Dream Crazy', paleta oscura con dorado, música orquestal épica, cámara lenta en momentos clave...">${b.refs||''}</textarea>
+
+<label>CTA / mensaje final (opcional)</label>
+<input id="f-cta" placeholder="Ej: Visita nuestra web · Compra hoy · Únete al movimiento" value="${b.cta||''}">
+
+<div class="btn-actions">
+  <button class="btn btn-primary" onclick="saveBriefAndNext()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    Generar narrativa con IA
+  </button>
+</div>
+`;
+}
+
+function renderNarrativa(){
+  if(state.loading) return `
+<div class="panel-title">Generando narrativa…</div>
+<div class="panel-sub">La IA está escribiendo el guión completo para tu proyecto.</div>
+<div class="loading-wrap"><div class="spinner"></div><span>Escribiendo guión con Claude AI…</span></div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="info-box" style="margin-top:20px">
+  <strong>Modo:</strong> ${state.mode==='corto'?'Ad Corto — '+state.brief.duracion+'s':'Contenido Largo — '+state.brief.duracion+' minutos'}<br>
+  <strong>Generador destino:</strong> ${state.brief.gen||'Seedance 2.0'}<br>
+  <strong>Tono:</strong> ${(state.brief.tono||[]).join(', ')||'Cinematográfico'}
+</div>`;
+
+  return `
+<div class="panel-title">Narrativa generada</div>
+<div class="panel-sub">Revisa y edita el guión antes de segmentarlo. Cada cambio se reflejará en las escenas.</div>
+<label>Guión / Voz en off</label>
+<textarea id="f-narrativa" style="min-height:340px;font-size:12.5px;line-height:1.85">${state.narrativa}</textarea>
+<div class="char-counter" id="char-count">${state.narrativa.split(' ').length} palabras · ${state.narrativa.length} caracteres</div>
+<div class="info-box">
+  <strong>Siguiente paso:</strong> el agente dividirá esta narración en ${calcNumEscenas()} escenas de ${state.mode==='corto'?'4':''+state.brief.clipdur} segundos y generará los prompts cinematográficos para cada clip.
+</div>
+<div class="btn-actions">
+  <button class="btn btn-ghost" onclick="goStep(0)">← Editar brief</button>
+  <button class="btn btn-ghost btn-sm" onclick="regenerarNarrativa()">↻ Regenerar</button>
+  <button class="btn btn-primary" onclick="generarEscenas()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    Segmentar en escenas
+  </button>
+</div>`;
+}
+
+function renderEscenas(){
+  if(state.loading) return `
+<div class="panel-title">Segmentando…</div>
+<div class="panel-sub">Dividiendo la narrativa en escenas individuales.</div>
+<div class="loading-wrap"><div class="spinner"></div><span>Analizando y segmentando en ${calcNumEscenas()} escenas…</span></div>
+<div class="progress-bar"><div class="progress-fill"></div></div>`;
+
+  return `
+<div class="panel-title">Escenas segmentadas</div>
+<div class="panel-sub">${state.escenas.length} escenas · ${state.mode==='corto'?state.brief.duracion+'s total':state.brief.duracion+' min total'} · ${state.mode==='corto'?'4':''+state.brief.clipdur}s por clip</div>
+<div class="scenes-grid">
+  ${state.escenas.slice(0,8).map((s,i)=>`
+  <div class="scene-card">
+    <div class="scene-num">ESCENA ${i+1}</div>
+    <div class="scene-narr">${s.narracion||''}</div>
+  </div>`).join('')}
+  ${state.escenas.length>8?`<div class="more-scenes">· · · y ${state.escenas.length-8} escenas más incluidas · · ·</div>`:''}
+</div>
+<div class="btn-actions">
+  <button class="btn btn-ghost" onclick="goStep(1)">← Editar narrativa</button>
+  <button class="btn btn-primary" onclick="generarPrompts()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    Generar prompts cinematográficos
+  </button>
+</div>`;
+}
+
+function renderPromptsPanel(){
+  if(state.loading) return `
+<div class="panel-title">Generando prompts…</div>
+<div class="panel-sub">La IA está creando cada prompt cinematográfico para ${state.brief.gen||'Seedance 2.0'}.</div>
+<div class="loading-wrap"><div class="spinner"></div><span>Procesando ${state.escenas.length} clips en lotes…</span></div>
+<div class="progress-bar"><div class="progress-fill"></div></div>
+<div class="info-box" style="margin-top:20px">Este proceso puede tardar 1-2 minutos dependiendo del número de escenas.</div>`;
+
+  return `
+<div class="panel-title">Prompts cinematográficos</div>
+<div class="panel-sub">${state.prompts.length} prompts listos para ${state.brief.gen||'Seedance 2.0'}</div>
+<div class="scenes-grid">
+  ${state.prompts.slice(0,5).map((s,i)=>`
+  <div class="scene-card">
+    <div class="scene-num">CLIP ${i+1}</div>
+    <div class="scene-narr">${s.narracion||''}</div>
+    <div class="scene-prompt">${s.prompt||''}</div>
+  </div>`).join('')}
+  ${state.prompts.length>5?`<div class="more-scenes">· · · y ${state.prompts.length-5} prompts más listos para exportar · · ·</div>`:''}
+</div>
+<div class="btn-actions">
+  <button class="btn btn-ghost" onclick="goStep(2)">← Ver escenas</button>
+  <button class="btn btn-primary" onclick="goStep(4)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    Ir a exportación
+  </button>
+</div>`;
+}
+
+function renderExportar(){
+  const total = state.prompts.length;
+  const durSeg = state.mode==='corto' ? parseInt(state.brief.duracion||60) : parseInt(state.brief.duracion||5)*60;
+  return `
+<div class="panel-title">Exportar producción</div>
+<div class="panel-sub">Todo listo. Elige qué bloque copiar y pégalo en tu generador de video.</div>
+
+<div class="export-box">
+  <div class="export-row"><span class="export-label">Proyecto</span><span class="export-val">${state.brief.marca||'—'}</span></div>
+  <div class="export-row"><span class="export-label">Modo</span><span class="export-val">${state.mode==='corto'?'Ad Corto':'Contenido Largo'}</span></div>
+  <div class="export-row"><span class="export-label">Duración</span><span class="export-val">${durSeg}s · ${total} clips</span></div>
+  <div class="export-row"><span class="export-label">Generador destino</span><span class="export-val">${state.brief.gen||'Seedance 2.0'}</span></div>
+  <div class="export-row"><span class="export-label">Estado</span><span><span class="badge badge-ok">✓ Listo para producción</span></span></div>
+</div>
+
+<div class="divider"><span>Selecciona qué exportar</span></div>
+
+<div class="export-btns">
+  <div class="export-btn-row" onclick="exportarBloque('narraciones')">
+    <div>
+      <div class="ebr-label">📄 Solo narraciones TTS</div>
+      <div class="ebr-sub">${total} líneas listas para voz en off</div>
+    </div>
+    <span class="ebr-icon">→</span>
+  </div>
+  <div class="export-btn-row" onclick="exportarBloque('prompts')">
+    <div>
+      <div class="ebr-label">🎬 Solo prompts de video</div>
+      <div class="ebr-sub">${total} prompts para ${state.brief.gen||'Seedance 2.0'}</div>
+    </div>
+    <span class="ebr-icon">→</span>
+  </div>
+  <div class="export-btn-row primary-row" onclick="exportarBloque('completo')">
+    <div>
+      <div class="ebr-label">📦 Paquete completo</div>
+      <div class="ebr-sub">Narraciones + Prompts en orden</div>
+    </div>
+    <span class="ebr-icon">★</span>
+  </div>
+</div>
+
+<div class="info-box">
+  Haz clic en un bloque para verlo en la vista previa, luego presiona <strong>Copiar todo</strong> para llevarlo a ${state.brief.gen||'Seedance 2.0'}.
+</div>
+
+<div class="btn-actions">
+  <button class="btn btn-ghost" onclick="nuevoProyecto()">+ Nuevo proyecto</button>
+</div>`;
+}
+
+// ── HELPERS ──────────────────────────────────────────────────
+function calcNumEscenas(){
+  const isCorto = state.mode === 'corto';
+  const clipDur = isCorto ? 4 : parseInt(state.brief.clipdur || 6);
+  const totalSeg = isCorto ? parseInt(state.brief.duracion || 60) : parseInt(state.brief.duracion || 5) * 60;
+  return Math.round(totalSeg / clipDur);
+}
+
+function toggleTag(field, val){
+  if(!state.brief[field]) state.brief[field] = [];
+  const arr = state.brief[field];
+  const idx = arr.indexOf(val);
+  if(idx > -1) arr.splice(idx,1); else arr.push(val);
+  document.querySelectorAll(`#tags-${field} .tag`).forEach(t => {
+    t.classList.toggle('sel', arr.includes(t.textContent));
+  });
+}
+
+function bindEvents(){
+  const nar = document.getElementById('f-narrativa');
+  if(nar){
+    nar.addEventListener('input', () => {
+      state.narrativa = nar.value;
+      const cc = document.getElementById('char-count');
+      if(cc) cc.textContent = nar.value.split(' ').length + ' palabras · ' + nar.value.length + ' caracteres';
+    });
+  }
+}
+
+function getApiKey(){
+  return document.getElementById('api-key').value.trim();
+}
+
+// ── SAVE BRIEF ───────────────────────────────────────────────
+function saveBriefAndNext(){
+  const get = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  state.brief.marca = get('f-marca').trim();
+  state.brief.producto = get('f-producto').trim();
+  state.brief.publico = get('f-publico').trim();
+  state.brief.duracion = get('f-duracion');
+  state.brief.gen = get('f-gen');
+  state.brief.refs = get('f-refs').trim();
+  state.brief.cta = get('f-cta').trim();
+  if(state.mode === 'largo') state.brief.clipdur = get('f-clipdur');
+
+  if(!state.brief.marca || !state.brief.producto){
+    alert('⚠️ Completa al menos la marca y la descripción del producto.');
+    return;
+  }
+  if(!getApiKey()){
+    alert('⚠️ Ingresa tu API Key de Anthropic en el campo superior.');
+    return;
+  }
+  state.step = 1;
+  state.loading = true;
+  renderSteps();
+  renderPanel();
+  generarNarrativaIA();
+}
+
+// ── API ──────────────────────────────────────────────────────
+async function callClaude(userPrompt, maxTokens = 2500){
+  const key = getApiKey();
+  const resp = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      
+      
+      
+      
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      messages: [{ role: 'user', content: userPrompt }]
+    })
+  });
+  if(!resp.ok){
+    const err = await resp.json();
+    throw new Error(err.error?.message || 'Error en la API');
+  }
+  const data = await resp.json();
+  return data.content.map(b => b.text || '').join('');
+}
+
+async function generarNarrativaIA(){
+  const b = state.brief;
+  const isCorto = state.mode === 'corto';
+  const tonos = (b.tono||[]).join(', ') || 'cinematográfico e inspirador';
+  const estilos = (b.estilo||[]).join(', ') || 'cinematográfico de alta calidad';
+  const numEsc = calcNumEscenas();
+
+  const prompt = isCorto ? `
+Eres un director creativo senior especializado en publicidad de alto impacto. Escribe el GUIÓN COMPLETO (voz en off) para un anuncio publicitario de ${b.duracion} segundos.
+
+DATOS DEL PROYECTO:
+- Marca / Producto: ${b.marca}
+- Descripción: ${b.producto}
+- Público objetivo: ${b.publico || 'audiencia general'}
+- Tono emocional: ${tonos}
+- Estilo visual: ${estilos}
+- CTA final: ${b.cta || 'incluye un cierre poderoso'}
+- Referencias: ${b.refs || 'ninguna específica'}
+- Generador de video: ${b.gen || 'Seedance 2.0'}
+
+INSTRUCCIONES CRÍTICAS:
+- Escribe ÚNICAMENTE el texto de la voz en off, corrido, sin acotaciones ni numeraciones.
+- Duración objetivo: ${b.duracion} segundos → aproximadamente ${Math.round(parseInt(b.duracion) * 2.5)} palabras (ritmo de locución publicitaria).
+- Estructura: HOOK impactante (primeros 3 segundos) → DESARROLLO emocional → CLÍMAX → CTA final.
+- Tono: ${tonos}. Lenguaje: directo, poderoso, memorable.
+- Cada frase debe poder visualizarse como una toma de video.
+- El texto debe estar completamente en español.
+- ESCRIBE SOLO EL GUIÓN. Sin explicaciones previas ni posteriores.
+` : `
+Eres un guionista experto en contenido de marca de largo aliento y documentales corporativos. Escribe el GUIÓN COMPLETO (voz en off) para un video de marca de ${b.duracion} minutos.
+
+DATOS DEL PROYECTO:
+- Marca / Producto: ${b.marca}
+- Descripción: ${b.producto}
+- Público objetivo: ${b.publico || 'audiencia general'}
+- Tono emocional: ${tonos}
+- Estilo visual: ${estilos}
+- CTA final: ${b.cta || 'cierre inspirador con propósito de marca'}
+- Referencias: ${b.refs || 'ninguna específica'}
+
+INSTRUCCIONES CRÍTICAS:
+- Escribe ÚNICAMENTE la narración en voz en off, corrida, sin acotaciones, títulos de sección ni numeraciones.
+- Duración objetivo: ${b.duracion} minutos → aproximadamente ${Math.round(parseInt(b.duracion) * 150)} palabras.
+- Estructura narrativa completa:
+  * Apertura inmersiva que establece el mundo de la marca (15%)
+  * Presentación del problema o aspiración del público (20%)
+  * Desarrollo: cómo la marca lo transforma (40%)
+  * Clímax emocional: el momento de transformación (15%)
+  * Cierre con propósito y CTA (10%)
+- Tono: ${tonos}. Estilo: cinematográfico, inmersivo, humano.
+- El texto debe estar completamente en español.
+- ESCRIBE SOLO EL GUIÓN. Sin explicaciones previas ni posteriores.
+`;
+
+  try {
+    const text = await callClaude(prompt, 3500);
+    state.narrativa = text.trim();
+    state.loading = false;
+    renderPanel();
+    renderSteps();
+    setSidebarContent('narrativa', `// GUIÓN — ${b.marca}\n// Modo: ${isCorto?'Ad Corto '+b.duracion+'s':'Contenido Largo '+b.duracion+'min'}\n// Generador: ${b.gen||'Seedance 2.0'}\n\n${state.narrativa}`);
+  } catch(e){
+    state.loading = false;
+    state.narrativa = 'Error al generar la narrativa: ' + e.message;
+    renderPanel();
+  }
+}
+
+async function regenerarNarrativa(){
+  state.loading = true;
+  renderPanel();
+  await generarNarrativaIA();
+}
+
+async function generarEscenas(){
+  const numEsc = calcNumEscenas();
+  const clipDur = state.mode === 'corto' ? 4 : parseInt(state.brief.clipdur || 6);
+
+  state.step = 2;
+  state.loading = true;
+  renderSteps();
+  renderPanel();
+
+  const wordsPerScene = Math.round(state.narrativa.split(' ').length / numEsc);
+
+  const prompt = `
+Eres un editor de video experto. Divide exactamente el siguiente texto en ${numEsc} fragmentos numerados.
+
+TEXTO A DIVIDIR:
+${state.narrativa}
+
+REGLAS ESTRICTAS:
+- Divide en EXACTAMENTE ${numEsc} fragmentos (ni más, ni menos).
+- Cada fragmento debe tener aproximadamente ${wordsPerScene} palabras.
+- No agregues ni quites palabras. Solo divide el texto existente.
+- Responde ÚNICAMENTE con JSON válido, sin markdown, sin explicaciones.
+- Formato exacto:
+{"escenas":[{"num":1,"narracion":"texto escena 1"},{"num":2,"narracion":"texto escena 2"}]}
+`;
+
+  try {
+    const text = await callClaude(prompt, 4000);
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    state.escenas = parsed.escenas || [];
+  } catch(e) {
+    // Fallback manual
+    const words = state.narrativa.split(' ');
+    const wpsc = Math.ceil(words.length / numEsc);
+    state.escenas = Array.from({length: numEsc}, (_, i) => ({
+      num: i + 1,
+      narracion: words.slice(i * wpsc, (i+1) * wpsc).join(' ')
+    }));
+  }
+
+  state.loading = false;
+  renderPanel();
+  renderSteps();
+
+  const sideText = state.escenas.map(s => `ESCENA ${s.num}\n${s.narracion}`).join('\n\n');
+  setSidebarContent('escenas', `// ESCENAS — ${state.brief.marca}\n// ${state.escenas.length} escenas · ${clipDur}s por clip\n\n${sideText}`);
+}
+
+async function generarPrompts(){
+  state.step = 3;
+  state.loading = true;
+  renderSteps();
+  renderPanel();
+
+  const b = state.brief;
+  const isCorto = state.mode === 'corto';
+  const clipDur = isCorto ? 4 : parseInt(b.clipdur || 6);
+  const tonos = (b.tono||[]).join(', ') || 'cinematográfico';
+  const estilos = (b.estilo||[]).join(', ') || 'cinematográfico';
+  const CHUNK = 8;
+  const allPrompts = [];
+
+  for(let i = 0; i < state.escenas.length; i += CHUNK){
+    const chunk = state.escenas.slice(i, i + CHUNK);
+
+    const escenesText = chunk.map(s => `[CLIP ${s.num}]: ${s.narracion}`).join('\n');
+
+    const prompt = isCorto ? `
+Eres un director de fotografía y prompt engineer experto en publicidad audiovisual y generación de video con IA.
+
+Para cada clip, genera un prompt cinematográfico detallado y profesional para ${b.gen || 'Seedance 2.0'}.
+
+PROYECTO: ${b.marca}
+ESTILO: ${estilos}
+TONO: ${tonos}
+DURACIÓN POR CLIP: ${clipDur} segundos
+REFERENCIAS: ${b.refs || 'ninguna'}
+
+CLIPS A PROCESAR:
+${escenesText}
+
+REGLAS PARA CADA PROMPT:
+- Mínimo 70 palabras por prompt
+- Incluir SIEMPRE: tipo de plano, ángulo, movimiento de cámara, acción principal, iluminación, atmósfera, paleta de color, calidad técnica
+- Para ads: especificar densidad de efectos (ALTA/MEDIA/BAJA), speed ramp si aplica, transición de salida
+- Estilo: hiperrealista, cinematográfico, 4K, alta gama
+- Conectar visualmente con los clips adyacentes
+- Todo en español excepto términos técnicos de cámara
+
+Responde ÚNICAMENTE con JSON válido:
+{"prompts":[{"num":${chunk[0].num},"narracion":"texto exacto del clip","prompt":"prompt cinematográfico detallado"},...]}`
+    : `
+Eres un director de fotografía experto en contenido de marca de largo aliento y documentales.
+
+Para cada clip, genera un prompt cinematográfico detallado para ${b.gen || 'Seedance 2.0'}.
+
+PROYECTO: ${b.marca}
+ESTILO: ${estilos}
+TONO: ${tonos}
+DURACIÓN POR CLIP: ${clipDur} segundos
+REFERENCIAS: ${b.refs || 'ninguna'}
+
+CLIPS A PROCESAR:
+${escenesText}
+
+REGLAS PARA CADA PROMPT:
+- Mínimo 80 palabras por prompt
+- Incluir: tipo de plano, ángulo, movimiento de cámara, sujeto y acción, entorno y locación, iluminación natural, atmósfera documental, continuidad visual con clips anteriores
+- Mantener coherencia de personajes si aparecen en múltiples escenas
+- Estilo: documental premium, hiperrealista, cinematográfico, 4K
+- Ritmo visual acorde al contenido emocional de la narración
+- Todo en español excepto términos técnicos
+
+Responde ÚNICAMENTE con JSON válido:
+{"prompts":[{"num":${chunk[0].num},"narracion":"texto exacto","prompt":"prompt detallado"},...]}`
+
+    try {
+      const text = await callClaude(prompt, 3500);
+      const clean = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+      allPrompts.push(...(parsed.prompts || []));
+    } catch(e) {
+      chunk.forEach(s => allPrompts.push({
+        num: s.num,
+        narracion: s.narracion,
+        prompt: `Cinematic ${estilos} shot for ${b.marca}. Professional advertising quality. Dramatic ${tonos} lighting. 4K ultra high definition. Smooth camera movement. ${b.refs||''}`
+      }));
+    }
+  }
+
+  state.prompts = allPrompts.sort((a, b) => a.num - b.num);
+  state.loading = false;
+  renderPanel();
+  renderSteps();
+
+  exportarBloque('completo');
+}
+
+// ── SIDEBAR ──────────────────────────────────────────────────
+function setSidebarContent(type, text){
+  const sb = document.getElementById('sidebar-body');
+  const st = document.getElementById('sidebar-title');
+  const labels = {narrativa:'Narrativa generada', escenas:`${state.escenas.length} escenas`, prompts:`${state.prompts.length} prompts listos`};
+  if(st) st.textContent = labels[type] || 'Vista previa';
+  if(sb){
+    sb.textContent = text;
+    sb.dataset.export = text;
+  }
+}
+
+function exportarBloque(tipo){
+  const sb = document.getElementById('sidebar-body');
+  const st = document.getElementById('sidebar-title');
+  let text = '';
+
+  const header = `// VIDEOAGENT PRO — ${state.brief.marca}\n// ${state.mode==='corto'?'Ad Corto '+state.brief.duracion+'s':'Contenido Largo '+state.brief.duracion+'min'} · ${state.prompts.length} clips · ${state.brief.gen||'Seedance 2.0'}\n// Generado: ${new Date().toLocaleDateString('es-ES')}\n\n`;
+
+  if(tipo === 'narraciones'){
+    st.textContent = 'Narraciones TTS';
+    text = header + '═══ NARRACIONES VOZ EN OFF ═══\n\n';
+    text += state.prompts.map(s => `[${s.num}] ${s.narracion}`).join('\n');
+  } else if(tipo === 'prompts'){
+    st.textContent = 'Prompts de video';
+    text = header + '═══ PROMPTS DE VIDEO ═══\n\n';
+    text += state.prompts.map(s => `[${s.num}] ${s.prompt}`).join('\n\n');
+  } else {
+    st.textContent = 'Paquete completo';
+    text = header;
+    text += '═══ NARRACIONES VOZ EN OFF ═══\n\n';
+    text += state.prompts.map(s => `[${s.num}] ${s.narracion}`).join('\n');
+    text += '\n\n\n═══ PROMPTS DE VIDEO ═══\n\n';
+    text += state.prompts.map(s => `[${s.num}] ${s.prompt}`).join('\n\n');
+  }
+
+  sb.textContent = text;
+  sb.dataset.export = text;
+}
+
+function copyOutput(){
+  const sb = document.getElementById('sidebar-body');
+  const text = sb.dataset.export || sb.textContent;
+  if(!text || text.length < 10){ alert('No hay contenido para copiar aún.'); return; }
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copiado';
+    btn.style.color = 'var(--success)';
+    btn.style.borderColor = 'var(--success)';
+    setTimeout(()=>{ btn.textContent=orig; btn.style.color=''; btn.style.borderColor=''; }, 2500);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('Copiado al portapapeles.');
+  });
+}
+
+function nuevoProyecto(){
+  if(!confirm('¿Comenzar un nuevo proyecto? Se perderá el actual.')) return;
+  state = { mode: state.mode, step: 0, brief: {}, narrativa: '', escenas: [], prompts: [], loading: false };
+  renderSteps();
+  renderPanel();
+  const sb = document.getElementById('sidebar-body');
+  sb.innerHTML = `<div class="sidebar-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg><p>El contenido generado<br>aparecerá aquí en tiempo real</p></div>`;
+  delete sb.dataset.export;
+}
+
+// Init
+renderPanel();
+</script>
+</body>
+</html>
